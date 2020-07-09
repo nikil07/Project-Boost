@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class Rocket : MonoBehaviour
 {
@@ -37,10 +39,10 @@ public class Rocket : MonoBehaviour
                 print("You are safe");
                 break;
             case "Finish":
-                print("You are safe");
+                SceneManager.LoadScene(1);
                 break;
             default:
-                print("KABOOM!!");
+                SceneManager.LoadScene(0);
                 break;
         }
     }
