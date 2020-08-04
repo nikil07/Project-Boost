@@ -19,10 +19,12 @@ public class Rocket : MonoBehaviour
     [SerializeField] ParticleSystem deathParticle;
     [SerializeField] ParticleSystem finishedParticle;
 
+    private int resetLevel = 0;
+
     enum State {Alive, Dead, Transcending}
     State state = State.Alive;
 
-    Boolean isCollisionsEnabled = true;
+    bool isCollisionsEnabled = true;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +35,7 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        isCollisionsEnabled = !isCollisionsEnabled;
         processInput();
     }
 
@@ -47,14 +50,14 @@ public class Rocket : MonoBehaviour
             engineParticle.Stop();
         }
 
-        if(Debug.isDebugBuild)
-            respondToDebugKeys();
+        respondToDebugKeys();
     }
 
     private void respondToDebugKeys()
     {
         if (Input.GetKeyDown(KeyCode.C)) {
-            isCollisionsEnabled = !isCollisionsEnabled;
+            //isCollisionsEnabled = !isCollisionsEnabled;
+            resetLevel = SceneManager.GetActiveScene().buildIndex;
         }
     }
 
@@ -70,7 +73,7 @@ public class Rocket : MonoBehaviour
         switch (collision.gameObject.tag)
         {
             case "Friendly":
-                print("You are safe");
+                //print("You are safe");
                 break;
             case "Finish":
                 state = State.Transcending;
@@ -85,10 +88,14 @@ public class Rocket : MonoBehaviour
                 rocketAudioSource.Stop();
                 rocketAudioSource.PlayOneShot(deathAudio);
                 deathParticle.Play();
-                StartCoroutine(loadLevel(3));
+                Invoke("resetLevels", 2f);
                 print("Dead");
                 break;
         }
+    }
+
+    private void resetLevels() {
+        SceneManager.LoadScene(resetLevel);
     }
 
     IEnumerator loadLevel(int level)
@@ -96,7 +103,10 @@ public class Rocket : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         // Code to execute after the delay
-        SceneManager.LoadScene(level);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        print("current scene index , " + currentSceneIndex);
+        if(currentSceneIndex <= SceneManager.sceneCountInBuildSettings)
+            SceneManager.LoadScene(++currentSceneIndex);
     }
 
     private void Rotate()
@@ -107,12 +117,12 @@ public class Rocket : MonoBehaviour
         rocketRigitBody.freezeRotation = true;
         if (Input.GetKey(KeyCode.A))
         {
-            print("A");
+            //print("A");
             transform.Rotate(Vector3.forward * rotationThisFrame);
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            print("D");
+            //print("D");
             transform.Rotate(-Vector3.forward * rotationThisFrame);
         }
         rocketRigitBody.freezeRotation = false;
